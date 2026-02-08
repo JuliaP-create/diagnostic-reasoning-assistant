@@ -23,6 +23,14 @@ conditions through two-tier architecture and transparent reasoning.
 ## Dataset
 - DDXPlus: 1.3M synthetic patient cases, 49 pathologies
 - Source: [Hugging Face](https://huggingface.co/datasets/aai530-group6/ddxplus)
+- NeurIPS 2022, Mila Quebec AI Institute
+- Size: 1,292,579 patient cases
+- Coverage: 49 pathologies, 223 evidence codes
+- Citation: Fansi Tchango et al. (2022)
+
+**Note:** This is a synthetic dataset generated from medical knowledge bases. 
+While it doesn't capture all real-world complexity, it provides a robust, 
+privacy-compliant foundation for developing and testing diagnostic AI systems.
 
 ## Technologies
 - Python, scikit-learn, XGBoost
