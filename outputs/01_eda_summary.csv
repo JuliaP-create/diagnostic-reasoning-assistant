@@ -1,0 +1,28 @@
+Metric,Value
+Total Records (All),"1,292,579"
+Unique Case Patterns,"1,278,666"
+Total Pathologies,49
+Total Evidence Codes,223
+Train Set,"1,025,602 (79.3%)"
+Validation Set,"132,448 (10.2%)"
+Test Set,"134,529 (10.4%)"
+Gender - Male,"620,614 (48.5%)"
+Gender - Female,"658,052 (51.5%)"
+Age Range,0-109 years
+Age Mean (SD),39.8 ± 22.7 years
+Age Median,39.0 years
+Most Common Disease,"URTI (81,767 cases)"
+Least Common Disease,Bronchiolitis (322 cases)
+Top 10 Coverage,36.5%
+Bottom 10 Coverage,6.2%
+Class Imbalance Ratio,1:253.9
+Avg Evidences (Unique Cases),13.65
+Avg Evidences (Paper Match),13.56
+Evidence Range,1-36
+Binary Evidence Codes,208 (93.3%)
+Categorical Evidence Codes,10 (4.5%)
+Multi-choice Evidence Codes,5 (2.2%)
+Symptoms,110 (49.3%)
+Antecedents,113 (50.7%)
+Avg DDX List Length,9.2
+DDX Range,1-34

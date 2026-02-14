@@ -1,0 +1,47 @@
+{
+  "dataset_overview": {
+    "n_rows_total": 1292579,
+    "n_cases_unique": 1278666,
+    "total_pathologies": 49,
+    "total_evidences": 223,
+    "train_size": 1025602,
+    "validation_size": 132448,
+    "test_size": 134529
+  },
+  "demographics": {
+    "male_count": 620614,
+    "female_count": 658052,
+    "age_min": 0,
+    "age_max": 109,
+    "age_mean": 39.76,
+    "age_std": 22.73,
+    "age_median": 39.0
+  },
+  "disease_distribution": {
+    "most_common": "URTI",
+    "most_common_count": 81767,
+    "least_common": "Bronchiolitis",
+    "least_common_count": 322,
+    "imbalance_ratio": 253.93,
+    "top10_coverage_pct": 36.52,
+    "bottom10_coverage_pct": 6.18
+  },
+  "evidence_statistics": {
+    "avg_per_patient_unique": 13.65,
+    "avg_per_patient_weighted": 13.56,
+    "min_per_patient": 1,
+    "max_per_patient": 36,
+    "median_per_patient": 13.0,
+    "binary_count": 208,
+    "categorical_count": 10,
+    "multi_count": 5,
+    "symptom_count": 110,
+    "antecedent_count": 113
+  },
+  "ddx_statistics": {
+    "avg_length": 9.22,
+    "median_length": 8.0,
+    "min_length": 1,
+    "max_length": 34
+  }
+}
