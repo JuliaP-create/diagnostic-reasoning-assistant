@@ -8,7 +8,7 @@ and (later) refining them through iterative questioning.
 
 ---
 
-## Project status (Week 1)
+## Project status (WIP — EDA complete, modeling started)
 ✅ **Week 1: Data Exploration & EDA (in progress / mostly complete)**
 
 Current work focuses on:
@@ -42,16 +42,17 @@ Current work focuses on:
 
 ---
 ## Technologies
-- Python, scikit-learn, XGBoost
-- LangChain, RAG (Retrieval-Augmented Generation)
-- Streamlit (web interface)
-- Tableau (EDA visualization)
+- Current: Python, scikit-learn, XGBoost
+- Planned: LangChain, RAG (Retrieval-Augmented Generation)
+- Planned: Streamlit (web interface)
+- Planned (optional): Tableau (EDA visualization)
 
 ## Repository structure (current)
 ```text
 .
 ├── notebooks/
 │   └── 01_data_exploration.ipynb
+│   ├── 02_model_development.ipynb
 ├── data/
 │   ├── release_evidences.json
 │   ├── release_conditions.json
