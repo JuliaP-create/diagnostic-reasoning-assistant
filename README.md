@@ -9,17 +9,29 @@ and (later) refining them through iterative questioning.
 ---
 
 ## Project status (WIP — EDA complete, modeling started)
-✅ **Week 1: Data Exploration & EDA (in progress / mostly complete)**
+✅ **Week 1: Data Exploration & EDA (complete)**
 
-Current work focuses on:
+This work focused on:
 - Loading the DDXPlus dataset (train/validate/test splits)
 - Parsing evidence and differential diagnosis fields into usable Python structures
 - Data quality checks (missingness, duplicates)
 - Exploratory visualizations and dataset understanding
 - Preparing the ground for feature engineering and modeling in Week 2
 
----
+✅ **Week 2: Model Development (in progress)**
 
+---
+## Results so far (early baseline)
+- Baseline models achieve very high accuracy when many evidences are available (expected with synthetic structured data).
+- Under limited information (masked evidence budget), Logistic Regression performs substantially better than BernoulliNB early in the interview.
+- Added evaluation curves: Top‑1 / Top‑3 / Top‑5 accuracy vs number of known positive evidences (m).
+
+### Phase 2: Top‑1 accuracy vs known evidences (m)
+![Top‑1 accuracy vs known evidences](figures/budget_curve_top1.png)
+<img src="figures/budget_curve_top1.png" width="700" alt="Top‑1 accuracy vs known evidences (m)">
+
+
+---
 ## Dataset
 **Primary dataset:** DDXPlus (synthetic clinical cases)
 - DDXPlus: 1,292,579 synthetic patient cases, 49 pathologies, 223 evidence codes
@@ -62,3 +74,16 @@ Current work focuses on:
 ├── requirements.txt               # (optional; add as you lock dependencies)
 └── README.md
 
+---
+## How to run (high-level)
+1. Create environment and install dependencies:
+   - `pip install -r requirements.txt`
+2. Download DDXPlus from Hugging Face (not stored in this repo).
+3. Run notebooks in order:
+   - `01_data_exploration.ipynb`
+   - `02_model_development.ipynb`
+
+Outputs:
+- Tables saved to `outputs/`
+- Figures saved to `figures/`
+- Trained models saved to `models/` (joblib)
