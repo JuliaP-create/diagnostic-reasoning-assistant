@@ -27,7 +27,7 @@ This work focused on:
 - Added evaluation curves: Top‑1 / Top‑3 / Top‑5 accuracy vs number of known positive evidences (m).
 
 ### Phase 3: Top‑1 accuracy vs known evidences (m)
-![Top‑1 accuracy vs known evidences](figures/12_budget_curve_top1.png)
+![Top‑1 accuracy vs known evidences](figures/ml/12_budget_curve_top1.png)
 
 
 
