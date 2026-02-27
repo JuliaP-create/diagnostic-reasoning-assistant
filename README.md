@@ -60,19 +60,24 @@ This work focused on:
 - Planned: Streamlit (web interface)
 - Planned (optional): Tableau (EDA visualization)
 
-## Repository structure (current)
+.## Repository structure (current)
 ```text
 .
 ├── notebooks/
-│   └── 01_data_exploration.ipynb
-│   ├── 02_model_development.ipynb
+│   ├── 01_data_exploration.ipynb
+│   └── 02_model_development.ipynb
 ├── data/
 │   ├── release_evidences.json
 │   ├── release_conditions.json
-│   └── processed/                 # created by notebooks (optional outputs)
-├── figures/                       # created by notebooks (plots)
-├── outputs/                       # created by notebooks (tables/summaries)
-├── requirements.txt               # (optional; add as you lock dependencies)
+│   └── processed/                 # optional cached artifacts
+├── figures/
+│   ├── eda/
+│   └── ml/
+├── outputs/
+│   ├── eda/
+│   └── ml/
+├── models/
+├── requirements.txt
 └── README.md
 
 ---
