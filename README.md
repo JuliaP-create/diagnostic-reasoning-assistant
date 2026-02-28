@@ -48,6 +48,9 @@ Top‑1 accuracy vs number of known positive evidences (m):
 ### Calibration (reliability diagram)
 ![Calibration reliability](figures/ml/21_calibration_reliability_3models.png)
 
+### Calibration vs known evidences — ECE
+![ECE vs evidence](figures/ml/22_calibration_vs_m_ece.png)
+
 ---
 
 ## Dataset
