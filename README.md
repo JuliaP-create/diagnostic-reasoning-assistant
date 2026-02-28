@@ -1,66 +1,77 @@
 # Diagnostic Reasoning Assistant (Bootcamp Final Project)
 
-An AI-powered *educational* diagnostic reasoning assistant that aims to support
-medical students and junior clinicians by generating ranked differential diagnoses
-and (later) refining them through iterative questioning.
+An AI-powered *educational* diagnostic reasoning assistant that supports medical students and junior clinicians by:
+1) ranking differential diagnoses from structured evidence, and
+2) (next) refining them through iterative questioning using an information-gain policy.
 
 > **Disclaimer:** Educational tool only. Not intended for direct patient care.
 
 ---
 
-## Project status (WIP — EDA complete, modeling started)
-✅ **Week 1: Data Exploration & EDA (complete)**
-
-This work focused on:
-- Loading the DDXPlus dataset (train/validate/test splits)
-- Parsing evidence and differential diagnosis fields into usable Python structures
-- Data quality checks (missingness, duplicates)
-- Exploratory visualizations and dataset understanding
-- Preparing the ground for feature engineering and modeling in Week 2
-
-✅ **Week 2: Model Development (in progress)**
+## Project status (WIP)
+✅ **Week 1: EDA complete**  
+✅ **Week 2: Model development complete (baseline + Phase 4 experiments)**  
+🔜 **Next: Question policy finalization + RAG explanations**
 
 ---
-## Results so far (early baseline)
-- Baseline models achieve very high accuracy when many evidences are available (expected with synthetic structured data).
-- Under limited information (masked evidence budget), Logistic Regression performs substantially better than BernoulliNB early in the interview.
-- Added evaluation curves: Top‑1 / Top‑3 / Top‑5 accuracy vs number of known positive evidences (m).
 
-### Phase 3: Top‑1 accuracy vs known evidences (m)
-![Top‑1 accuracy vs known evidences](figures/ml/12_budget_curve_top1.png)
+## Key results (current best)
+### Best model: Logistic Regression with token/value-level evidence encoding
+- Evidence representation:
+  - **Base encoding:** 223 evidence bases
+  - **Token encoding:** 972 value-level tokens (e.g., `E_55=V_29`)
+- Full test set performance:
+  - **LogReg (base):** Top‑1 ≈ 0.9938, Macro‑F1 ≈ 0.9926
+  - **LogReg (token):** Top‑1 ≈ 0.9974, Macro‑F1 ≈ 0.9963  
+- Token encoding significantly reduces clinically meaningful confusions, including acute vs chronic rhinosinusitis.
 
+### Calibration (probability quality)
+We evaluated probability calibration using:
+- multiclass log-loss (lower is better)
+- ECE (Expected Calibration Error; 0 is perfect)
 
-
+All three models are near-diagonal on reliability plots with very low ECE (~0.001–0.002). Token LogReg is best overall (lowest log-loss and ECE).
 
 ---
+
+## Figures (recommended)
+### Interactive setting: Accuracy vs evidence budget
+Top‑1 accuracy vs number of known positive evidences (m):
+![Top‑1 accuracy vs evidences](figures/ml/12_budget_curve_top1.png)
+
+### Token encoding improvement (headline metrics)
+![Base vs Token metrics](figures/ml/15_base_vs_token_headline_metrics.png)
+
+### Error analysis: biggest confusion reductions
+![Top confusion reductions](figures/ml/20_top5_confusion_reductions_base_vs_token.png)
+
+### Calibration (reliability diagram)
+![Calibration reliability](figures/ml/21_calibration_reliability_3models.png)
+
+---
+
 ## Dataset
 **Primary dataset:** DDXPlus (synthetic clinical cases)
-- DDXPlus: 1,292,579 synthetic patient cases, 49 pathologies, 223 evidence codes
-- Source: [Hugging Face](https://huggingface.co/datasets/aai530-group6/ddxplus)
-- NeurIPS 2022, Mila Quebec AI Institute
-- Citation: Fansi Tchango et al. (2022)
+- 1,292,579 synthetic patient cases
+- 49 pathologies
+- 223 evidence bases (+ 972 token/value-level features)
+- Differential diagnosis list included but **not used as a predictive input feature**.
 
-**The dataset contains:**
-- Demographics (e.g., age, sex)
-- Evidence codes (symptoms/findings; some are binary, categorical, or multi-choice)
-- Ground truth pathology (diagnosis)
-- Differential diagnosis list
+**Mapping files**
+- `data/release_evidences.json` (evidence code → question text, data type, value meanings)
+- `data/release_conditions.json` (condition code → disease metadata)
 
-**Mapping files used in EDA:**
-- `data/release_evidences.json` (evidence code → question text, type, value meanings)
-- `data/release_conditions.json` (condition code → disease info)
-
-> Note: DDXPlus is synthetic, privacy-safe data. Results will reflect in-dataset performance
-> and may not generalize to real clinical populations without further validation.
+> Note: DDXPlus is synthetic, privacy-safe data. Results reflect in-dataset performance and may not generalize to real clinical populations.
 
 ---
-## Technologies
-- Current: Python, scikit-learn, XGBoost
-- Planned: LangChain, RAG (Retrieval-Augmented Generation)
-- Planned: Streamlit (web interface)
-- Planned (optional): Tableau (EDA visualization)
 
-.## Repository structure (current)
+## Technologies
+- Python, scikit-learn
+- (Planned next) RAG for explanations / question wording
+
+---
+
+## Repository structure
 ```text
 .
 ├── notebooks/
@@ -79,7 +90,7 @@ This work focused on:
 ├── models/
 ├── requirements.txt
 └── README.md
-
+```
 ---
 ## How to run (high-level)
 1. Create environment and install dependencies:
