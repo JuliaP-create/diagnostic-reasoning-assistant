@@ -2,7 +2,7 @@
 
 An AI-powered *educational* diagnostic reasoning assistant that supports medical students and junior clinicians by:
 1) ranking differential diagnoses from structured evidence, and
-2) (next) refining them through iterative questioning using an information-gain policy.
+2) refining them through iterative questioning using an information-gain policy (next).
 
 > **Disclaimer:** Educational tool only. Not intended for direct patient care.
 
@@ -10,8 +10,9 @@ An AI-powered *educational* diagnostic reasoning assistant that supports medical
 
 ## Project status (WIP)
 ✅ **Week 1: EDA complete**  
-✅ **Week 2: Model development complete (baseline + Phase 4 experiments)**  
-🔜 **Next: Question policy finalization + RAG explanations**
+✅ **Week 2: Model development complete (baseline + Phase 4 experiments)** *(ML work started Feb 14)*  
+✅ **Week 3: Calibration + interactive assistant loop prototype (token model + question policy prototype)**  
+🔜 **Next (final week): RAG explanations + deployment + final presentation**
 
 ---
 
@@ -34,7 +35,7 @@ All three models are near-diagonal on reliability plots with very low ECE (~0.00
 
 ---
 
-## Figures (recommended)
+## Selected figures
 ### Interactive setting: Accuracy vs evidence budget
 Top‑1 accuracy vs number of known positive evidences (m):
 ![Top‑1 accuracy vs evidences](figures/ml/12_budget_curve_top1.png)
@@ -50,6 +51,16 @@ Top‑1 accuracy vs number of known positive evidences (m):
 
 ### Calibration vs known evidences — ECE
 ![ECE vs evidence](figures/ml/22_calibration_vs_m_ece.png)
+
+---
+
+## Deployment artifacts (no retraining required)
+The deployed assistant loads pre-trained artifacts from `models/`:
+- Token Logistic Regression model (e.g., `models/logreg_token_multinomial.joblib`)
+- Preprocessors bundle (e.g., `models/preprocessors.joblib`) containing:
+  - `mlb_token`, `ohe`, `scaler`, `label_encoder`
+  - feature metadata (column lists / feature names)
+- Calibrated model (or calibrator wrapper), if used in the app (filename depends on your notebook export)
 
 ---
 
@@ -71,6 +82,7 @@ Top‑1 accuracy vs number of known positive evidences (m):
 ## Technologies
 - Python, scikit-learn
 - (Planned next) RAG for explanations / question wording
+- (Planned next) Streamlit deployment
 
 ---
 
@@ -95,7 +107,7 @@ Top‑1 accuracy vs number of known positive evidences (m):
 └── README.md
 ```
 ---
-## How to run (high-level)
+## How to run
 1. Create environment and install dependencies:
    - `pip install -r requirements.txt`
 2. Download DDXPlus from Hugging Face (not stored in this repo).
