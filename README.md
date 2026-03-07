@@ -1,26 +1,40 @@
 # Diagnostic Reasoning Assistant (Bootcamp Final Project)
 
-An AI-powered **educational** diagnostic reasoning assistant built on the **DDXPlus** dataset.
+An AI-powered **educational** diagnostic reasoning assistant that supports medical students and junior clinicians by:
+1) ranking differential diagnoses from structured evidence, and
+2) refining them through iterative questioning using a **base-level information-gain policy**, and
+3) providing **grounded, local-only explanations** via TF‑IDF retrieval (RAG-style explanations without LLM calls).
 
-It demonstrates an end-to-end offline workflow:
-1) predict a ranked differential diagnosis from structured evidence (token Logistic Regression), and  
-2) iteratively refine the differential by asking the next best evidence question (information-gain policy),  
-3) provide **grounded, user-facing explanations** using **local TF‑IDF retrieval** over a curated corpus (DDXPlus definitions + mini‑manuals).
-
-> **Safety disclaimer:** This repository is for education and demonstration only. It is **not medical advice** and is **not intended for direct patient care**.
+> **Disclaimer:** Educational tool only. Not medical advice. Not intended for direct patient care.
 
 ---
 
-## Project status (current)
-✅ **Week 1:** EDA complete  
-✅ **Week 2:** Model development complete (baseline + Phase 4 experiments)  
-✅ **Week 3:** Calibration + interactive assistant loop prototype (token model + question policy)  
-✅ **Week 4:** **Notebook 03 complete — offline TF‑IDF RAG explanations + multi‑turn demo traces saved**
+## Project status
+✅ **MVP complete (March 2026)**
 
-**Next (remaining work):**
-- Refactor Notebook 03 helpers into `src/rag.py`
-- Streamlit demo app (symptom input → iterative Q&A → ranked diagnoses + explanations)
-- Final presentation prep
+The MVP includes:
+- Token/value-level diagnosis ranking (Logistic Regression)
+- Base-level question selection (information-gain policy)
+- Local TF‑IDF retrieval for explanations (evidence definitions + condition metadata + mini‑manual)
+- Streamlit demo app (`app.py`) using reusable logic in `src/rag.py`
+
+**Planned next (post-submission):** evaluation extensions (more models/features), UI polish (session export), and optional LLM *rewriting* layer (kept strictly separate from prediction).
+
+---
+
+## Architecture (MVP)
+**Per turn:**
+1. Update session state (age/sex + answered evidences)
+2. Predict Top‑k diagnoses using the trained **token model**
+3. Select next base evidence via **information gain**
+4. Retrieve supporting context locally (TF‑IDF)
+5. Render explanations (collapsible in notebook; expanders in Streamlit)
+
+**Non-negotiable constraints (by design):**
+- No retraining during inference
+- No external APIs / no live PubMed / no LLM calls
+- Local TF‑IDF retrieval only
+- Safety disclaimer on user-facing screens
 
 ---
 
@@ -32,10 +46,10 @@ It demonstrates an end-to-end offline workflow:
 - Full test set performance:
   - **LogReg (base):** Top‑1 ≈ 0.9938, Macro‑F1 ≈ 0.9926
   - **LogReg (token):** Top‑1 ≈ 0.9974, Macro‑F1 ≈ 0.9963  
-- Token encoding significantly reduces clinically meaningful confusions (e.g., acute vs chronic rhinosinusitis).
+- Token encoding significantly reduces clinically meaningful confusions, including acute vs chronic rhinosinusitis.
 
 ### Calibration (probability quality)
-We evaluate probability calibration using:
+We evaluated probability calibration using:
 - multiclass log-loss (lower is better)
 - ECE (Expected Calibration Error; 0 is perfect)
 
@@ -43,23 +57,9 @@ All three models are near-diagonal on reliability plots with very low ECE (~0.00
 
 ---
 
-## Notebook 03 (RAG explanations) — what is now implemented
-Notebook 03 connects the predictive assistant loop to an explanation layer that stays **fully offline**:
-
-- **Canonical TF‑IDF retriever:** `outputs/rag/tfidf_retriever.joblib` (321 local documents)
-- **Mini‑manuals (49 conditions):** saved to `outputs/rag/mini_manual/` and loaded back into memory for explanations
-- **Clinical enrichment source:** `src/condition_enrichments.py` (`CONDITION_ENRICHMENTS` dict; keys match `data/release_conditions.json`)
-- **Multi‑turn demos + logs (for validation / presentation):**
-  - `outputs/rag/demo_trace_log.json`
-  - `outputs/rag/ambiguous_seed_demo_log.json`
-
-All user-facing explanation text is framed as educational and includes a safety disclaimer.
-
----
-
 ## Selected figures
 ### Interactive setting: Accuracy vs evidence budget
-Top‑1 accuracy vs number of known positive evidences (m):  
+Top‑1 accuracy vs number of known positive evidences (m):
 ![Top‑1 accuracy vs evidences](figures/ml/12_budget_curve_top1.png)
 
 ### Token encoding improvement (headline metrics)
@@ -76,116 +76,146 @@ Top‑1 accuracy vs number of known positive evidences (m):
 
 ---
 
+## What was added for the MVP (RAG explanations + Streamlit)
+### Notebook 03: RAG explanations (offline)
+Notebook 03 builds a local retrieval layer and validates explanations:
+- Builds **mini‑manual** markdown docs for each condition (49 files)
+- Builds canonical TF‑IDF retriever: `outputs/rag/tfidf_retriever.joblib`
+- Integrates explanations into the demo loop:
+  - `explain_topk_diagnoses()`
+  - `explain_next_question()`
+- Saves complete demo traces (including explanations) to JSON
+
+### Streamlit demo app
+- `app.py` provides an interactive Q&A UI
+- `src/rag.py` packages the reusable logic:
+  - artifact loading (`load_resources()`)
+  - evidence translation + clustering for initial input
+  - `assistant_step()` (predict → update posterior with negatives → choose next question)
+  - explanation builders
+
+---
+
 ## Deployment artifacts (no retraining required)
-The assistant runs from **saved artifacts** (joblib) — no retraining is required.
+The deployed assistant loads pre-trained artifacts from `models/`:
+- Token Logistic Regression model (prefer calibrated if present)
+  - e.g., `models/logreg_token_calibrated.joblib` (or a raw token LR fallback)
+- Preprocessors bundle (preferred): `models/preprocessors.joblib` containing:
+  - `mlb_base`, `mlb_token`, `ohe`, `scaler`, `label_encoder`
+  - feature metadata (column lists / feature names)
+- Policy artifacts: `models/policy_artifacts.joblib`
 
-### Models (`models/`)
-- Token Logistic Regression:
-  - `models/logreg_token_multinomial.joblib`
-  - `models/logreg_token_calibrated.joblib` (preferred when available)
-- Question policy artifacts:
-  - `models/policy_artifacts.joblib` (includes `p_e_given_d`, evidence base list, etc.)
-- Preprocessors (bundle preferred; legacy fallbacks supported):
-  - `models/preprocessors.joblib` *(preferred; contains `mlb_base`, `mlb_token`, encoders, and feature specs)*
-  - `models/preprocessors_token.joblib` *(legacy)*
-  - `models/preprocessors_base.joblib` *(legacy)*
-
-### RAG (`outputs/rag/`)
+**RAG / explanation artifacts written to `outputs/rag/`:**
 - `outputs/rag/tfidf_retriever.joblib`
 - `outputs/rag/mini_manual/index.json`
-- `outputs/rag/mini_manual/*.md` (49 files)
-- `outputs/rag/mini_manual_summary.csv`
+- `outputs/rag/mini_manual/*.md` (49 docs)
 - `outputs/rag/demo_trace_log.json`
 - `outputs/rag/ambiguous_seed_demo_log.json`
+- `outputs/rag/evidence_clusters.json` (UI-only clustering for initial findings)
+
+> Note: If any `.joblib` artifacts exceed GitHub file size limits, use Git LFS.
 
 ---
 
 ## Dataset
 **Primary dataset:** DDXPlus (synthetic clinical cases)
-- ~1.29M synthetic patient cases
+- 1,292,579 synthetic patient cases
 - 49 pathologies
 - 223 evidence bases (+ 972 token/value-level features)
-- Differential diagnosis list included but **not used as a predictive input feature**.
+- Differential diagnosis list included but **not used as a predictive input feature**
 
-**Mapping files (tracked in repo)**
-- `data/release_evidences.json` (evidence code → question text, data type, value meanings)
-- `data/release_conditions.json` (condition name → disease metadata)
+**Mapping files (required for MVP runtime)**
+- `data/release_evidences.json` (evidence code → question text, type, default value, value meanings)
+- `data/release_conditions.json` (condition → disease metadata)
 
 > Note: DDXPlus is synthetic, privacy-safe data. Results reflect in-dataset performance and may not generalize to real clinical populations.
 
 ---
 
 ## Technologies
-- Python, scikit-learn
-- Offline TF‑IDF retrieval (RAG baseline)
-- (Next) Streamlit deployment
+- Python, scikit-learn, joblib
+- TF‑IDF retrieval (local corpus)
+- Streamlit (interactive demo app)
 
 ---
 
 ## Repository structure
 ```text
 .
+├── app.py
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_model_development.ipynb
-│   └── 03_rag_explanations_ddxplus.ipynb
+│   └── 03_rag_explanations_ddxplus_SUBMISSION.ipynb
 ├── src/
+│   ├── __init__.py
 │   ├── artifacts.py
 │   ├── encoding.py
 │   ├── inference.py
 │   ├── policy.py
+│   ├── rag.py
 │   ├── types.py
 │   └── condition_enrichments.py
 ├── data/
 │   ├── release_evidences.json
-│   ├── release_conditions.json
-│   └── processed/                 # optional cached artifacts
+│   └── release_conditions.json
 ├── figures/
 │   ├── eda/
-│   ├── ml/
-│   └── rag/
+│   └── ml/
 ├── outputs/
 │   ├── eda/
 │   ├── ml/
 │   └── rag/
 ├── models/
-├── scripts/
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## How to run
-### 1) Set up the environment
+## Quickstart (MVP)
+### 1) Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2) Data availability
-The full DDXPlus case dataset is typically downloaded separately (not stored in this repo).  
-However, **Notebook 03** does **not** require the full case dataset if the `models/` artifacts are already present.
+### 2) Ensure required files exist
+- `data/release_evidences.json`
+- `data/release_conditions.json`
+- `models/preprocessors.joblib` (or `models/preprocessors_token.joblib`)
+- `models/policy_artifacts.joblib`
+- token LR model artifact (prefer calibrated if available)
 
-### 3) Run notebooks (recommended order)
-1. `notebooks/01_data_exploration.ipynb`  
-2. `notebooks/02_model_development.ipynb`  
-   - saves `models/` artifacts (model, calibrator, policy table, preprocessors)
-3. `notebooks/03_rag_explanations_ddxplus.ipynb`  
-   - builds the TF‑IDF retriever
-   - runs demo traces with explanations
-   - saves RAG artifacts + logs to `outputs/rag/`
+### 3) Run the Streamlit app
+```bash
+streamlit run app.py
+```
 
-### 4) Known environment note (joblib + scikit-learn)
-If you see an `InconsistentVersionWarning` when loading artifacts, pin scikit‑learn to the version used when the models were saved.
+### 4) (Optional) Rebuild the RAG artifacts + validate explanations
+Run the notebooks in order:
+- `01_data_exploration.ipynb`
+- `02_model_development.ipynb`
+- `03_rag_explanations_ddxplus_SUBMISSION.ipynb`
+
+Outputs:
+- Figures saved to `figures/`
+- Tables saved to `outputs/`
+- Trained models saved to `models/`
+- RAG artifacts + demo logs saved to `outputs/rag/`
 
 ---
 
-## What we intentionally did not do (for the bootcamp deadline)
-- No dense embeddings / vector database
-- No external PubMed retrieval at runtime
-- No LLM API calls (offline-only requirement)
+## Known limitations (current build)
+- DDXPlus is synthetic and limited to 49 conditions
+- Evidence wording can be awkward (dataset-driven); clustering/translation is heuristic (UI-only)
+- Model comparison scope is limited (baseline + a small set of experiments)
+- Streamlit demo is MVP-level (e.g., session export is a good next enhancement)
 
 ---
 
-## License / attribution
-DDXPlus is a published synthetic benchmark dataset; please follow the dataset’s license and terms for any redistribution.
+## Next steps (post-submission)
+- Refactor remaining notebook-only helpers into `src/` (keep `src/rag.py` as the reusable interface)
+- Improve evidence phrasing + grouping for user-facing clarity
+- Add downloadable session summary (JSON + human-readable text)
+- Evaluate additional models (e.g., XGBoost) and feature engineering (strictly within the same dataset split)
+- Optional: add an LLM **only as a rewriting layer** for UI text (never for prediction)
