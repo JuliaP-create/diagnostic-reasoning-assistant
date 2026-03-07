@@ -146,7 +146,7 @@ The deployed assistant loads pre-trained artifacts from `models/`:
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_model_development.ipynb
-│   └── 03_rag_explanations_ddxplus_SUBMISSION.ipynb
+│   └── 03_rag_explanations_ddxplus.ipynb
 ├── src/
 │   ├── __init__.py
 │   ├── artifacts.py
@@ -167,6 +167,7 @@ The deployed assistant loads pre-trained artifacts from `models/`:
 │   ├── ml/
 │   └── rag/
 ├── models/
+|── Diagnostc_Assistant.pdf     # project presentation
 ├── requirements.txt
 └── README.md
 ```
