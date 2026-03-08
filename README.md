@@ -1,5 +1,7 @@
 # Diagnostic Reasoning Assistant (Bootcamp Final Project)
 
+**Live app (Streamlit Community Cloud):** <https://diagnostic-reasoning-assistant.streamlit.app/>
+
 An AI-powered **educational** diagnostic reasoning assistant that supports medical students and junior clinicians by:
 1) ranking differential diagnoses from structured evidence, and
 2) refining them through iterative questioning using a **base-level information-gain policy**, and
@@ -168,7 +170,8 @@ The deployed assistant loads pre-trained artifacts from `models/`:
 │   └── rag/
 ├── models/
 |── Diagnostc_Assistant.pdf     # project presentation
-├── requirements.txt
+├── requirements.txt            # for streamlit app
+├── requirements-dev.txt        # for all the notebooks
 └── README.md
 ```
 
